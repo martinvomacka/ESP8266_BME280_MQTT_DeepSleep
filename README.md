@@ -6,13 +6,20 @@ This simple project is to show cheap TEMPERATURE/HUMIDITY/PRESSURE sensor build 
 - Uses MQTT to publish measured values (further use for various aplications like Smart Home, IFTTT, ...)
 
 ## What do you need
-- ESP8266 board (this project was tested on LoLin NodeMCU V3)
-- Bosch BME280 sensor (this project was tested on GY-BM ME/PM 280 6 pins board)
+- ESP8266 board (this project was tested on **LoLin NodeMCU V3**)
+- Bosch BME280 sensor (this project was tested on **GY-BM ME/PM 280** 6 pins board)
 - Breadboard or other way to connect GPIO pins
 - External Arduino libraries
   - [PubSubClient by Nick O'Leary](https://github.com/knolleary/pubsubclient/)
   - [BME280 by finitespace](https://github.com/finitespace/BME280)
 - MQTT server to push measured values
+
+## To-Do / Further plans
+- [ ] Create wiring diagram
+- [ ] Test on different ESP8266 boards
+- [ ] Measure power consumption for deep-sleep vs. sleep time combinations
+- [ ] Compare measurements between different board vendors
+- [ ] Create interactive "web inital setup" - SoftAP portal for initial setup (SSID, WiFi password, MQTT server IP, MQTT topic, sleep time)
 
 ## Photos of used HW
 ###### BME280 sensor (bought online) - this is 3.3V version! Be careful about this, there is also 5V version.
