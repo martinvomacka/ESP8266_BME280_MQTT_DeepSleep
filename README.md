@@ -13,3 +13,12 @@ This simple project is to show cheap TEMPERATURE/HUMIDITY/PRESSURE sensor build 
   - [PubSubClient by Nick O'Leary](https://github.com/knolleary/pubsubclient/)
   - [BME280 by finitespace](https://github.com/finitespace/BME280)
 - MQTT server to push measured values
+
+## Photos of used HW
+###### BME280 sensor (bought online) - this is 3.3V version! Be careful about this, there is also 5V version.
+Bottom view:
+![Bottom view of BME280](https://github.com/martinvomacka/ESP8266_BME280_MQTT_DeepSleep/blob/master/photos/BME280_bottom.jpg)
+Top view:
+![Top view of BME280](https://github.com/martinvomacka/ESP8266_BME280_MQTT_DeepSleep/blob/master/photos/BME280_top.jpg)
+###### LoLin NodeMCU V3 - I have borrowed this board since I'm waiting for ordered Wemos D1 Mini.
+![LoLin NodeMCU V3](https://github.com/martinvomacka/ESP8266_BME280_MQTT_DeepSleep/blob/master/photos/NodeMCU_V3.jpg)
