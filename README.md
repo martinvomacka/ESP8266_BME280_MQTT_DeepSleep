@@ -7,7 +7,7 @@ This simple project is to show cheap TEMPERATURE/HUMIDITY/PRESSURE sensor build 
 
 ## What do you need
 - ESP8266 board (this project was tested on **LoLin NodeMCU V3**)
-- Bosch BME280 sensor (this project was tested on **GY-BM ME/PM 280** 6 pins board)
+- Bosch BME280 sensor (this project was tested on **GY-BM ME/PM 280** 6-pin board)
 - Breadboard or other way to connect GPIO pins
 - External Arduino libraries
   - [PubSubClient by Nick O'Leary](https://github.com/knolleary/pubsubclient/)
