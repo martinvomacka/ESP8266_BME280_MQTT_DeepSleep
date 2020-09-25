@@ -14,8 +14,12 @@ This simple project is to show cheap TEMPERATURE/HUMIDITY/PRESSURE sensor build 
   - [BME280 by finitespace](https://github.com/finitespace/BME280)
 - MQTT server to push measured values
 
+## Wiring diagram
+**Pins D0 (ESP8266 WAKE) and RST must be connected together so the board can wake up from deep-sleep.**
+![Wiring diagram](https://github.com/martinvomacka/ESP8266_BME280_MQTT_DeepSleep/blob/master/photos/wiring_diagram.jpg)
+
 ## To-Do / Further plans
-- [ ] Create wiring diagram
+- [x] Create wiring diagram
 - [ ] Test on different ESP8266 boards
 - [ ] Measure power consumption for deep-sleep vs. sleep time combinations
 - [ ] Compare measurements between different board vendors
