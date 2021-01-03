@@ -19,6 +19,8 @@
 
 #include <BME280I2C.h>
 #include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <ESP8266httpUpdate.h>
 #include <Wire.h>
 #include <PubSubClient.h>
 
@@ -48,6 +50,10 @@ BME280::PresUnit presUnit(BME280::PresUnit_hPa);
 float temp = 0.0;
 float hum = 0.0;
 float pres = 0.0;
+//FW version for OTA updates
+const int FW_VERSION = 1000;
+//FW download URL for OTA updates
+const char* FWURL = "http://YOUR_WEBSERVER_FW_PATH/";
 
 /*
     For deep-sleep to work properly, everything must happen in the setup()
@@ -76,6 +82,9 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
   }
+  
+  //Check for OTA FW update - UNCOMMENT TO USE THIS FEATURE
+  //checkForUpdates();
 
   //Setup MQTT server
   client.setServer(MQTT_SERVER, 1883);
@@ -93,6 +102,58 @@ void setup() {
 
   //Deep-sleep for defined time
   ESP.deepSleep(SLEEP_MINUTES * 60 * 1000000);
+}
+
+/*
+    This function checks server WWW path from fwServerUrl via HTTP GET to check for available FW updates.
+    This is done in 2 steps:
+    1) [board-MAC-address].verison file is checked on the server.
+      Verison file contains only one line - numeric value of FW version on the server.
+      If the server FW version is higher than board FW version, OTA update will begin
+    2) OTA update downloads [board-MAC-address].bin file from server and starts the update.
+      Board is automaticaly rebooted after the OTA update.
+*/
+void checkForUpdates() {
+  //Get board MAC address
+  String mac = WiFi.macAddress();
+  //Remove ":" from MAC address string (char ":" is not allowed in filenames)
+  mac.replace(":","");
+  //Prepare URL to check FW version on server for this board
+  String boardUrl = String(fwServerUrl);
+  boardUrl.concat(mac);
+  //Preapre separate String verisonUrl to be able tu use boardUrl to dowload .bin if needed in next steps
+  String versionUrl = boardUrl;
+  versionUrl.concat(".version");
+  //Create new HTTP connection using the version URL
+  HTTPClient httpClient;
+  httpClient.begin(versionUrl);
+  //GET version from URL
+  int httpRetCode = httpClient.GET();
+  if(httpRetCode == 200) {
+    //Successfully found and .version file on server - read the version number as string
+    String serverFwVersion = httpClient.getString();
+    //Convert String number to INT
+    int newVersion = serverFwVersion.toInt();
+    //Compare current version with server version
+    if(newVersion > FW_VERSION) {
+      Serial.print("Server has new FW available - starting update to FW version: ");
+      Serial.println(serverFwVersion);
+      //Preapre separate String binUrl to download the FW binary
+      String binUrl = boardUrl;
+      binUrl.concat(".bin");
+      //Start the FW update via OTA using binUrl
+      ESPhttpUpdate.update(binUrl);
+    }
+    else {
+      Serial.print("Board is running latest FW version: ");
+      Serial.println(FW_VERSION);
+    }
+  }
+  else {
+    Serial.print("Error during HTTP GET:");
+    Serial.println(httpRetCode);
+  }
+  httpClient.end();
 }
 
 /*

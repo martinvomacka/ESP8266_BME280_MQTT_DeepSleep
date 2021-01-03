@@ -45,6 +45,7 @@ Below are my measurements on different setups/boards that are all running exactl
   - ESP-12F - *aditional components required (minimum 3x 10k? resistor) + tiny precise soldering*
 - [x] Measure power consumption for deep-sleep vs. sleep time combinations
 - [x] Compare measurements between different board vendors
+- [x] Added OTA update feature - all credits to Erik H. Bakke and his [tutorial](https://www.bakke.online/index.php/2017/06/02/self-updating-ota-firmware-for-esp8266/) - please follow this link to undestand properly how to setup OTA (webserver to store .version and .bin files needed)
 - [ ] Create interactive "web inital setup" - SoftAP portal for initial setup (SSID, WiFi password, MQTT server IP, MQTT topic, sleep time)  
 - [ ] Plan a design compact case to be able to print it on 3D printer
 
