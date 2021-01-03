@@ -71,6 +71,7 @@ void setup() {
   while (!Serial) {} // Wait
 
   //Setup WiFi connection
+  WiFi.hostname("Kitchen-WS"); // Kitchen - weather station
   WiFi.begin(WIFI_SSID, WIFI_PWD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
