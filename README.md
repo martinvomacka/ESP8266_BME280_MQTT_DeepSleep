@@ -4,19 +4,34 @@ This simple project is to show cheap TEMPERATURE/HUMIDITY/PRESSURE sensor build 
 - Uses cheap and small BME280 sensor
 - Uses deep-sleep functionality of ESP8266 to minimize the power consumption
 - Uses MQTT to publish measured values (further use for various aplications like Smart Home, IFTTT, ...)
+- **Has SoftAP config mode** to setup all values (WiFi SSID, WiFi password, MQTT server IP, MQTT topic, sleep time, OTA URL (optional))
+- **Utilizes HW switch to select mode** (standard/config). Default switch PIN is set to D6 (GPIO12) - **connect GPIO12 to GND to enter config mode**
 
 ## What do you need
-- ESP8266 board (this project was tested on **LoLin NodeMCU V3**)
+- ESP8266 board - I use ESP-12F (alse tested on **LoLin NodeMCU V3, Wemos D1 mini**)
 - Bosch BME280 sensor (this project was tested on **GY-BM ME/PM 280** 6-pin board)
-- Breadboard or other way to connect GPIO pins
+- Breadboard or other way to connect GPIO pins (soldering)
 - External Arduino libraries
   - [PubSubClient by Nick O'Leary](https://github.com/knolleary/pubsubclient/)
   - [BME280 by finitespace](https://github.com/finitespace/BME280)
-- MQTT server to push measured values
+- MQTT server and topic to push measured values
+- *[OPTIONAL] OTA server to use OTA fatures (needs URL where to look for new FW)*
 
 ## Wiring diagram (LoLin NodeMCU V3)
 **Pins D0 (ESP8266 WAKE) and RST must be connected together so the board can wake up from deep-sleep.**
+**Connect D6 to GND to enter config mode**
 ![Wiring diagram](https://github.com/martinvomacka/ESP8266_BME280_MQTT_DeepSleep/blob/master/photos/wiring_diagram.jpg)
+
+## SoftAP
+Simple webpage to enter all needed values:
+- **Enter SSID** - WiFi SSID that will be used to connect to during standard mode
+- **Enter password** - WiFi password that will be used to connect to during standard mode
+- **Measurement interval [minutes]** - time used for deep sleep in minutes (takes value 1-60)
+- **MQTT server IP address** - IP for the MQTT server
+- **MQTT topic path** - topic to store values into
+- **Use OTA updates?** - Radio button to select whether to use OTA updates or not (if **No** selected, the URL text field will become inactive)
+- **SAVE** - stores the values into EEPROM and refreshes the page
+![SoftAP webpage](https://github.com/martinvomacka/ESP8266_BME280_MQTT_DeepSleep/blob/master/photos/softap_webpage.png)
 
 ## Measured consumption
 Below are my measurements on different setups/boards that are all running exactly the same code.
@@ -48,6 +63,7 @@ Below are my measurements on different setups/boards that are all running exactl
 - [x] Added OTA update feature - all credits to Erik H. Bakke and his [tutorial](https://www.bakke.online/index.php/2017/06/02/self-updating-ota-firmware-for-esp8266/) - please follow this link to undestand properly how to setup OTA (webserver to store .version and .bin files needed)
 - [x] Create interactive "web inital setup" - SoftAP portal for setup (SSID, WiFi password, MQTT server IP, MQTT topic, sleep time, OTA URL (optional))
   - [x] add switch or jumper to be able to enter this mode on demand (jumper/switch on - boot to SoftAP and publish setting website... turn off and get back to measuring and deep sleep cycles)
+- [ ] Implement secure method to post values on webpage instead of simple HTTP POST
 - [ ] Plan a design compact case to be able to print it on 3D printer
 
 ## Photos of used HW
@@ -64,3 +80,5 @@ Top view:
 ![Wemos D1 mini + battery shield](https://github.com/martinvomacka/ESP8266_BME280_MQTT_DeepSleep/blob/master/photos/Wemos_D1_mini_BS.jpg)
 ###### ESP-12F
 ![ESP-12F](https://github.com/martinvomacka/ESP8266_BME280_MQTT_DeepSleep/blob/master/photos/ESP-12F.jpg)
+###### ESP-12F in development board (spring contacts)
+![ESP-12F in devboard](https://github.com/martinvomacka/ESP8266_BME280_MQTT_DeepSleep/blob/master/photos/ESP-12F_in_devboard.jpg)
