@@ -31,7 +31,8 @@ Simple webpage to enter all needed values:
 - **MQTT topic path** - topic to store values into
 - **Use OTA updates?** - Radio button to select whether to use OTA updates or not (if **No** selected, the URL text field will become inactive)
 - **SAVE** - stores the values into EEPROM and refreshes the page
-![SoftAP webpage](https://github.com/martinvomacka/ESP8266_BME280_MQTT_DeepSleep/blob/master/photos/softap_webpage.png)
+
+![SoftAP webpage](https://github.com/martinvomacka/ESP8266_BME280_MQTT_DeepSleep/blob/master/photos/softap_webpage.png | width=350)
 
 ## Measured consumption
 Below are my measurements on different setups/boards that are all running exactly the same code.
