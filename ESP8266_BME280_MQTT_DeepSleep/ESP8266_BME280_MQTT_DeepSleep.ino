@@ -49,7 +49,7 @@ float temp = 0.0;
 float hum = 0.0;
 float pres = 0.0;
 //FW version for OTA updates
-const int FW_VERSION = 1002;
+const int FW_VERSION = 1003;
 //Variables definition for EEPROM
 char ssid[32] = "";
 char password[32] = "";
@@ -172,7 +172,7 @@ void printWebPage() {
       "<html>"
       "<head>"
       "<meta name = \"viewport\" content = \"width = device-width, initial-scale = 1.0, maximum-scale = 1.0, user-scalable=0\">"
-      "<title>TEST setup portal</title>"
+      "<title>Config page</title>"
       "<style>"
       "\"body { background-color: #808080; font-family: Arial, Helvetica, Sans-Serif; Color: #000000; }\""
       "</style>"
@@ -184,7 +184,7 @@ void printWebPage() {
       "otaText.disabled = chkYes.checked ? false : true;"
       "if (!otaText.disabled) {otaText.focus();}}"
       "</script>"
-      "<h1>TEST setup portal</h1>"
+      "<h1>Config page</h1>"
       "<form action=\"/\" method=\"post\">"
       "<p>"
       "<label for=\"ssid\">Enter SSID:</label><br />"
