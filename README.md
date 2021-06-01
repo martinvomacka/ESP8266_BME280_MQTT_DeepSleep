@@ -58,14 +58,20 @@ Below are my measurements on different setups/boards that are all running exactl
 - [x] Test on different ESP8266 boards
   - LoLin NodeMCU V3
   - Wemos D1 mini
-  - ESP-12F - *aditional components required (minimum 3x 10k? resistor) + tiny precise soldering*
+  - ESP-12F - *aditional components required (power supply, resistors, etc...) + tiny precise soldering*
 - [x] Measure power consumption for deep-sleep vs. sleep time combinations
 - [x] Compare measurements between different board vendors
+- [ ] Implement options for MQTT
+  - [ ] Authentication (right now it uses public access to MQTT)
+  - [ ] Port (right now it uses default port 1883)
+  - [ ] Secure conection (???)
 - [x] Added OTA update feature - all credits to Erik H. Bakke and his [tutorial](https://www.bakke.online/index.php/2017/06/02/self-updating-ota-firmware-for-esp8266/) - please follow this link to undestand properly how to setup OTA (webserver to store .version and .bin files needed)
 - [x] Create interactive "web inital setup" - SoftAP portal for setup (SSID, WiFi password, MQTT server IP, MQTT topic, sleep time, OTA URL (optional))
-  - [x] add switch or jumper to be able to enter this mode on demand (jumper/switch on - boot to SoftAP and publish setting website... turn off and get back to measuring and deep sleep cycles)
+  - [ ] Add www radio button for optional MQTT authentication
+  - [x] Add switch or jumper to be able to enter this mode on demand (jumper/switch on - boot to SoftAP and publish setting website... turn off and get back to measuring and deep sleep cycles)
 - [ ] Implement secure method to post values on webpage instead of simple HTTP POST
 - [ ] Plan a design compact case to be able to print it on 3D printer
+- [x] Design and make custom PCB
 
 ## Photos of used HW
 ###### BME280 sensor (bought online) - this is 3.3V version! Be careful about this, there is also 5V version.
