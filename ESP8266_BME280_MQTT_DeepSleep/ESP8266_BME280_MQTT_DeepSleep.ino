@@ -54,10 +54,13 @@ const int FW_VERSION = 1003;
 char ssid[32] = "";
 char password[32] = "";
 char mqtt_ip[20] = "";
+char mqtt_user[64] = "";
+char mqtt_password[64] = "";
 char mqtt_topic[128] = "";
 char ota_url[128] = "";
 int interval;
 int use_ota;
+int use_mqtt_auth;
 //Global bools for setup and loop control
 bool exec_mode;
 bool creds;
@@ -85,25 +88,34 @@ bool loadCredentials() {
   EEPROM.get(0+sizeof(ssid)+sizeof(password), interval);
   //Read MQTT server IP address
   EEPROM.get(0+sizeof(ssid)+sizeof(password)+sizeof(interval), mqtt_ip);
+  //Read MQTT user
+  EEPROM.get(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip), mqtt_user);
+  //Read MQTT password
+  EEPROM.get(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_user), mqtt_password);
   //Read MQTT topic
-  EEPROM.get(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip), mqtt_topic);
+  EEPROM.get(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_user)+sizeof(mqtt_password), mqtt_topic);
   //Read OTA server URL
-  EEPROM.get(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_topic), ota_url);
+  EEPROM.get(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_user)+sizeof(mqtt_password)+sizeof(mqtt_topic), ota_url);
   //Read indicator whether use OTA or not
-  EEPROM.get(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_topic)+sizeof(ota_url), use_ota);
+  EEPROM.get(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_user)+sizeof(mqtt_password)+sizeof(mqtt_topic)+sizeof(ota_url), use_ota);
+  //Read indicator whether use MQTT auth or not
+  EEPROM.get(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_user)+sizeof(mqtt_password)+sizeof(mqtt_topic)+sizeof(ota_url)+sizeof(use_ota), use_mqtt_auth);
   char ok[2+1];
   //Read last 2 bytes as verification we reached end of all stored values
-  EEPROM.get(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_topic)+sizeof(ota_url)+sizeof(use_ota), ok);
+  EEPROM.get(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_user)+sizeof(mqtt_password)+sizeof(mqtt_topic)+sizeof(ota_url)+sizeof(use_ota)+sizeof(use_mqtt_auth), ok);
   EEPROM.end();
   //Compare last 2 read bytes to verify all the contents were read properly (last 2 bytes must contain string "OK") if not, set all variables null
   if (String(ok) != String("OK")) {
     ssid[0] = 0;
     password[0] = 0;
     mqtt_ip[0] = 0;
+    mqtt_user[0] = 0;
+    mqtt_password[0] = 0;
     mqtt_topic[0] = 0;
     ota_url[0] = 0;
     interval = 0;
     use_ota = 0;
+    use_mqtt_auth = 0;
     return false;
   }
   else {
@@ -125,15 +137,21 @@ void saveCredentials() {
   EEPROM.put(0+sizeof(ssid)+sizeof(password), interval);
   //Store MQTT server IP address
   EEPROM.put(0+sizeof(ssid)+sizeof(password)+sizeof(interval), mqtt_ip);
+  //Store MQTT server user
+  EEPROM.put(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip), mqtt_user);
+  //Store MQTT server password
+  EEPROM.put(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_user), mqtt_password);
   //Store MQTT topic
-  EEPROM.put(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip), mqtt_topic);
+  EEPROM.put(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_user)+sizeof(mqtt_password), mqtt_topic);
   //Store OTA server URL
-  EEPROM.put(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_topic), ota_url);
+  EEPROM.put(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_user)+sizeof(mqtt_password)+sizeof(mqtt_topic), ota_url);
   //Store 0 or 1 to indicate whether use OTA or not
-  EEPROM.put(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_topic)+sizeof(ota_url), use_ota);
+  EEPROM.put(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_user)+sizeof(mqtt_password)+sizeof(mqtt_topic)+sizeof(ota_url), use_ota);
+  //Store 0 or 1 to indicate whether use MQTT auth or not
+  EEPROM.put(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_user)+sizeof(mqtt_password)+sizeof(mqtt_topic)+sizeof(ota_url)+sizeof(use_mqtt_auth), use_mqtt_auth);
   //Store "OK" as verification we reached end of all stored values
   char ok[2+1] = "OK";
-  EEPROM.put(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_topic)+sizeof(ota_url)+sizeof(use_ota), ok);
+  EEPROM.put(0+sizeof(ssid)+sizeof(password)+sizeof(interval)+sizeof(mqtt_ip)+sizeof(mqtt_user)+sizeof(mqtt_password)+sizeof(mqtt_topic)+sizeof(ota_url)+sizeof(use_ota)+sizeof(use_mqtt_auth), ok);
   //ESP8266 - need to .commit() and .end() to write the contents to FLASH
   EEPROM.commit();
   EEPROM.end();
@@ -179,10 +197,13 @@ void printWebPage() {
       "</head>"
       "<body>"
       "<script type=\"text/javascript\">"
-      "function EnableDisableTextBox(){var chkYes = document.getElementById(\"otaYes\");"
-      "var txtPassportNumber = document.getElementById(\"otaText\");"
+      "function EnableDisableTextBoxOTA(){var chkYes = document.getElementById(\"otaYes\");"
       "otaText.disabled = chkYes.checked ? false : true;"
       "if (!otaText.disabled) {otaText.focus();}}"
+      "function EnableDisableTextBoxMQTT(){var chkYes = document.getElementById(\"mqttAuthYes\");"
+      "mqttUser.disabled = mqttAuthYes.checked ? false : true;"
+      "mqttPassword.disabled = mqttAuthYes.checked ? false : true;"
+      "if (!mqttuser.disabled) {otaText.focus();}}"
       "</script>"
       "<h1>Config page</h1>"
       "<form action=\"/\" method=\"post\">"
@@ -199,7 +220,7 @@ void printWebPage() {
     server.sendContent(String(password));
     server.sendContent(
       "\" required><br />"
-      "<label for=\"password\">Measurement interval [minutes]:</label><br />"
+      "<label for=\"interval\">Measurement interval [minutes]:</label><br />"
       "<input type=\"number\" pattern=\"[0-9]*\" name=\"interval\" min=\"1\" max=\"60\" value=\""
     );
     server.sendContent(String(interval));
@@ -217,12 +238,47 @@ void printWebPage() {
     server.sendContent(String(mqtt_topic));
     server.sendContent(
       "\"><br />"
+      "Use MQTT authentication?<br />"
+    );
+    if(use_mqtt_auth) {
+      server.sendContent(
+        "<input type=\"radio\" id=\"mqttAuthYes\" name=\"mqtt-radio\" value=\"1\" checked=\"checked\" onclick=\"EnableDisableTextBoxMQTT()\"><label for=\"mqttAuthYes\">Yes</label><br />"
+        "<input type=\"radio\" id=\"mqttAuthNo\" name=\"mqtt-radio\" value=\"0\" onclick=\"EnableDisableTextBoxMQTT()\"><label for=\"mqttAuthNo\">No</label><br />"
+        "<label for=\"mqtt-user\">MQTT-user</label><input type=\"text\"  id=\"mqttUser\" name=\"mqtt-user\" size=\"32\" maxlength=\"63\" value=\""
+      );
+      server.sendContent(String(mqtt_user));
+      server.sendContent(
+        "\"><br />"
+        "<label for=\"mqtt-password\">MQTT-password</label><input type=\"password\"  id=\"mqttPassword\" name=\"mqtt-password\" size=\"32\" maxlength=\"63\" value=\""
+      );
+      server.sendContent(String(mqtt_password));
+      server.sendContent(
+        "\"><br />"
+      );
+    }
+    else {
+      server.sendContent(
+        "<input type=\"radio\" id=\"mqttAuthYes\" name=\"mqtt-radio\" value=\"1\" onclick=\"EnableDisableTextBoxMQTT()\"><label for=\"mqttAuthYes\">Yes</label><br />"
+        "<input type=\"radio\" id=\"mqttAuthNo\" name=\"mqtt-radio\" value=\"0\" checked=\"checked\" onclick=\"EnableDisableTextBoxMQTT()\"><label for=\"mqttAuthNo\">No</label><br />"
+        "<label for=\"mqtt-user\">MQTT-user</label><input type=\"text\" id=\"mqttUser\" disabled name=\"mqtt-user\" size=\"32\" maxlength=\"63\" value=\""
+      );
+      server.sendContent(String(mqtt_user));
+      server.sendContent(
+        "\"><br />"
+        "<label for=\"mqtt-password\">MQTT-password</label><input type=\"password\" id=\"mqttPassword\" disabled name=\"mqtt-password\" size=\"32\" maxlength=\"63\" value=\""
+      );
+      server.sendContent(String(mqtt_password));
+      server.sendContent(
+        "\"><br />"
+      );
+    }
+    server.sendContent(
       "Use OTA updates?<br />"
     );
     if(use_ota) {
       server.sendContent(
-        "<input type=\"radio\" id=\"otaYes\" name=\"ota-radio\" value=\"1\" checked=\"checked\" onclick=\"EnableDisableTextBox()\"><label for=\"otaYes\">Yes</label><br />"
-        "<input type=\"radio\" id=\"otaNo\" name=\"ota-radio\" value=\"0\" onclick=\"EnableDisableTextBox()\"><label for=\"otaNo\">No</label><br />"
+        "<input type=\"radio\" id=\"otaYes\" name=\"ota-radio\" value=\"1\" checked=\"checked\" onclick=\"EnableDisableTextBoxOTA()\"><label for=\"otaYes\">Yes</label><br />"
+        "<input type=\"radio\" id=\"otaNo\" name=\"ota-radio\" value=\"0\" onclick=\"EnableDisableTextBoxOTA()\"><label for=\"otaNo\">No</label><br />"
         "<input type=\"text\"  id=\"otaText\" name=\"ota-url\" size=\"32\" maxlength=\"127\" value=\""
       );
     }
@@ -263,6 +319,16 @@ void handleRoot() {
     else {
       use_ota = 0;
       String("http://server/OTA/").toCharArray(ota_url, sizeof(ota_url) - 1);
+    }
+    if(server.arg("mqtt-radio").toInt() == 1) {
+      use_mqtt_auth = 1;
+      server.arg("mqtt-user").toCharArray(mqtt_user, sizeof(mqtt_user) - 1);
+      server.arg("mqtt-password").toCharArray(mqtt_password, sizeof(mqtt_password) - 1);
+    }
+    else {
+      use_mqtt_auth = 0;
+      String("foo").toCharArray(mqtt_user, sizeof(mqtt_user) - 1);
+      String("bar").toCharArray(mqtt_password, sizeof(mqtt_password) - 1);
     }
     interval = server.arg("interval").toInt();
     //Store all variables to EEPROM
@@ -397,7 +463,7 @@ void setup(void)
       WiFi.softAPConfig(softAP_ip, softAP_ip, softAP_netmask);
       WiFi.softAP(softAP_ssid, softAP_password);
       delay(500);
-      
+
       server.on("/", handleRoot);  
       server.onNotFound(handleNotFound);
       server.begin();
@@ -407,10 +473,13 @@ void setup(void)
       String("SSID").toCharArray(ssid, sizeof(ssid) - 1);
       String("password").toCharArray(password, sizeof(password) - 1);
       String("000.000.000.000").toCharArray(mqtt_ip, sizeof(mqtt_ip) - 1);
+      String("foo").toCharArray(mqtt_user, sizeof(mqtt_user) - 1);
+      String("bar").toCharArray(mqtt_password, sizeof(mqtt_password) - 1);
       String("default/topic").toCharArray(mqtt_topic, sizeof(mqtt_topic) - 1);
       String("http://server/OTA/").toCharArray(ota_url, sizeof(ota_url) - 1);
       interval = 1;
       use_ota = 0;
+      use_mqtt_auth = 0;
       saveCredentials();
     }
   }
@@ -419,7 +488,7 @@ void setup(void)
       Serial.println();
       Serial.println("Standard mode...");
       digitalWrite(LED, HIGH);
-      WiFi.hostname("Kitchen-WS"); // Kitchen - weather station
+      WiFi.hostname("fischer-WS1"); // Fischer WS1
       WiFi.begin(ssid, password);
       while (WiFi.status() != WL_CONNECTED) {
         delay(500);
@@ -432,6 +501,10 @@ void setup(void)
       
       //Setup MQTT server
       client.setServer(mqtt_ip, 1883);
+      if(use_mqtt_auth) {
+        //Serial.println(mqtt_user);
+        //Serial.println(mqtt_password);
+      }
     
       //Setup I2C connection for the sensor
       Wire.begin();
