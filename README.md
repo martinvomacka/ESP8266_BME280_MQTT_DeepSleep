@@ -61,7 +61,7 @@ Below are my measurements on different setups/boards that are all running exactl
   - ESP-12F - *aditional components required (power supply, resistors, etc...) + tiny precise soldering*
 - [x] Measure power consumption for deep-sleep vs. sleep time combinations
 - [x] Compare measurements between different board vendors
-- [*] Implement options for MQTT
+- [ ] Implement options for MQTT
   - [x] Authentication (right now it uses public access to MQTT)
   - [x] Port (right now it uses default port 1883)
   - [ ] Secure conection (???)
