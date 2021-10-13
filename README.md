@@ -61,13 +61,13 @@ Below are my measurements on different setups/boards that are all running exactl
   - ESP-12F - *aditional components required (power supply, resistors, etc...) + tiny precise soldering*
 - [x] Measure power consumption for deep-sleep vs. sleep time combinations
 - [x] Compare measurements between different board vendors
-- [ ] Implement options for MQTT
+- [-] Implement options for MQTT
   - [x] Authentication (right now it uses public access to MQTT)
   - [x] Port (right now it uses default port 1883)
   - [ ] Secure conection (???)
 - [x] Added OTA update feature - all credits to Erik H. Bakke and his [tutorial](https://www.bakke.online/index.php/2017/06/02/self-updating-ota-firmware-for-esp8266/) - please follow this link to undestand properly how to setup OTA (webserver to store .version and .bin files needed)
 - [x] Create interactive "web inital setup" - SoftAP portal for setup (SSID, WiFi password, MQTT server IP, MQTT topic, sleep time, OTA URL (optional))
-  - [ ] Add www radio button for optional MQTT authentication
+  - [x] Add www radio button for optional MQTT authentication
   - [x] Add switch or jumper to be able to enter this mode on demand (jumper/switch on - boot to SoftAP and publish setting website... turn off and get back to measuring and deep sleep cycles)
 - [ ] Implement secure method to post values on webpage instead of simple HTTP POST
 - [ ] Plan a design compact case to be able to print it on 3D printer
